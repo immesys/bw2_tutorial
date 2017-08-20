@@ -1,9 +1,17 @@
 FROM jupyter/pyspark-notebook
 
 USER root
-RUN apt-get update && apt-get install daemon
+RUN apt-get update && apt-get install -y daemon python-pip
 
 ## GABE add any dependencies you need here
+ADD python /home/$NB_USER/
+ENV PYTHONPATH /home/$NB_USER/python
+RUN pip2 install msgpack-python
+
+RUN python2 -m pip install ipython==5.4 ipykernel
+RUN python2 -m ipykernel install --user
+RUN chown -R $NB_USER /home/$NB_USER/.local/share/jupyter
+RUN chown -R $NB_USER /home/$NB_USER/.ipynb_checkpoints
 
 COPY start.sh /usr/local/bin/
 COPY ragent /bin/

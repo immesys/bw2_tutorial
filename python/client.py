@@ -19,7 +19,7 @@ def get_client(agent=None, entity=None):
     if agent is None:
         agent = os.environ.get('BW2_AGENT','127.0.0.1:28589')
     if entity is None:
-        entity = os.environ.get('BW2_DEFAULT_ENTITY',None)
+        entity = os.environ.get('BW2_DEFAULT_ENTITY','/etc/rise_entity.ent')
 
     if agent is None:
         raise Exception("Need to provide an agent or set BW2_AGENT")
