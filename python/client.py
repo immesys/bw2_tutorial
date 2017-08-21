@@ -2,8 +2,25 @@ from bw2python import ponames
 from bw2python.client import Client as BW2Client
 from bw2python.bwtypes import PayloadObject
 import msgpack
+import time
 import json
 import os
+
+# keepalive when the client starts
+import threading
+import socket
+hostname = socket.getfqdn()
+_client = None
+def _keepalive():
+    global _client
+    while True:
+        if _client is not None:
+            _client.publish('scratch.ns/risealive', (64,0,0,0), hostname)
+        time.sleep(30)
+_keepalive_worker = threading.Thread(target=_keepalive)
+_keepalive_worker.daemon = True
+_keepalive_worker.start()
+
 
 def once(func):
     def execute(*args, **kwargs):
@@ -27,7 +44,12 @@ def get_client(agent=None, entity=None):
         raise Exception("Need to provide an entity or set BW2_DEFAULT_ENTITY")
 
     hostname, port = agent.split(':')
-    return Client(hostname, port, entity)
+    c = Client(hostname, port, entity)
+
+    # hack for the keepalive above
+    global _client
+    _client = c
+    return c
 
 def unmarshal(po):
     """
