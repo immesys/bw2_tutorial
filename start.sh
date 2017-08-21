@@ -8,6 +8,8 @@ set -e
 if [ $(id -u) == 0 ] ; then
     # run the ragent in the background
     daemon --name ragent --respawn -- /bin/ragent client /etc/rise_entity.ent ragent.cal-sdb.org:28590 MT3dKUYB8cnIfsbnPrrgy8Cb_8whVKM-Gtg2qd79Xco= 0.0.0.0:28589
+    python2 /usr/local/bin/getentity.py
+    export BW2_DEFAULT_BANKROLL="/home/$NB_USER/ns.ent"
 
     # Handle username change. Since this is cheap, do this unconditionally
     usermod -d /home/$NB_USER -l $NB_USER jovyan
