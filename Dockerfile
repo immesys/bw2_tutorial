@@ -11,6 +11,7 @@ RUN pip2 install msgpack-python
 RUN python2 -m pip install ipython==5.4 ipykernel
 RUN python2 -m ipykernel install --user
 RUN chown -R $NB_USER /home/$NB_USER/.local/share/jupyter
+RUN mkdir -p /home/$NB_USER/.ipynb_checkpoints
 RUN chown -R $NB_USER /home/$NB_USER/.ipynb_checkpoints
 
 COPY start.sh /usr/local/bin/
