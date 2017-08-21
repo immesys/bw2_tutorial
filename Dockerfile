@@ -14,6 +14,7 @@ RUN mkdir -p /home/$NB_USER/.ipynb_checkpoints
 RUN chown -R $NB_USER /home/$NB_USER/.ipynb_checkpoints
 
 COPY getentity.py /usr/local/bin/
+COPY getaccess /home/$NB_USER
 COPY start.sh /usr/local/bin/
 COPY ragent /bin/
 RUN chmod 0755 /bin/ragent
