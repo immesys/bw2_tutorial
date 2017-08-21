@@ -3,7 +3,7 @@ import ipywidgets as widgets
 import os
 
 class Widgets():
-    def __init__(self, namespace = None, switch_name = "switch0", light_name = "light0", bw_agent = None, bw_entity = None):
+    def __init__(self, namespace = None, switch_name = "switch0", light_name = "light0", switch_entity = "switch.ent", light_entity = "light.ent", bw_agent = None):
         if namespace is None:
             namespace = os.environ.get('NAMESPACE')
         if namespace is None:
@@ -47,8 +47,10 @@ class Widgets():
         self._box = widgets.Box(children=items, layout=box_layout)
     
         # init WAVE client
-        self._bw_client = get_client(agent=bw_agent, entity=bw_entity)
-        self._bw_client.subscribe(self._light_url, self._light_callback)
+        self._switch_bw_client = get_client(agent=bw_agent, entity=switch_entity)
+
+        self._light_bw_client = get_client(agent=bw_agent, entity=light_entity)
+        self._light_bw_client.subscribe(self._light_url, self._light_callback)
 
     def display(self):
         display(self._box)
@@ -61,9 +63,9 @@ class Widgets():
 
     def _switch_on_click(self, change):
         if change['new'] == "Turn On":
-            self._bw_client.publish(self._switch_url, (64,0,0,1), "true")
+            self._switch_bw_client.publish(self._switch_url, (64,0,0,1), "true")
         elif change['new'] == "Turn Off":
-            self._bw_client.publish(self._switch_url, (64,0,0,1), "false")
+            self._switch_bw_client.publish(self._switch_url, (64,0,0,1), "false")
     
     def _light_callback(self, msg):
         # print "received: ", msg.payload
