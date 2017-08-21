@@ -7,7 +7,7 @@ class Widgets():
         self._url = url
        
         # init light bulb 
-        img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "../images")
+        img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
         img_light_on_path = os.path.join(img_path, "light_on.png")
         img_light_off_path = os.path.join(img_path, "light_off.png")
         self._img_light_on = open(img_light_on_path, "rb").read()
