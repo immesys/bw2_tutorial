@@ -83,7 +83,7 @@ class Switch():
         if namespace is None:
             raise Exception("Need to provide a namespace or set NAMESPACE")
 
-        self._switch_url = namespace + "/s.switch/" + name + "/i.boolean/signal/state"
+        self._url = namespace + "/s.switch/" + name + "/i.boolean/signal/state"
        
         # init switch 
         self._switch = widgets.ToggleButtons(
@@ -127,10 +127,10 @@ class Switch():
         time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S (%Z)")
         if change['new'] == "Turn On":
             self._append_text("[" + time_str + "] switch is turned on.")
-            self._switch_bw_client.publish(self._switch_url, (64,0,0,1), "true")
+            self._switch_bw_client.publish(self._url, (64,0,0,1), "true")
         elif change['new'] == "Turn Off":
             self._append_text("[" + time_str + "] switch is turned off.")
-            self._switch_bw_client.publish(self._switch_url, (64,0,0,1), "false")
+            self._switch_bw_client.publish(self._url, (64,0,0,1), "false")
     
     def _append_text(self, text):
         if self._text != "":
