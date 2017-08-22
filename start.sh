@@ -11,7 +11,7 @@ if [ $(id -u) == 0 ] ; then
     python2 /usr/local/bin/getentity.py
     export BW2_DEFAULT_BANKROLL="/home/$NB_USER/ns.ent"
     export NAMESPACE=$(bw2 i /home/$NB_USER/ns.ent | awk '{if($2~"Alias") print $3}')
-
+    rm -f .bw2bind.log
     # Handle username change. Since this is cheap, do this unconditionally
     usermod -d /home/$NB_USER -l $NB_USER jovyan
 
