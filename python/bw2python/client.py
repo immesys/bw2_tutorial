@@ -1,9 +1,9 @@
 import datetime
 import msgpack
 import os
+import base64
 import socket
 import sys
-import base64
 import threading
 import Queue
 
@@ -949,7 +949,7 @@ class Client(object):
             del self.synchronous_cond_vars[seq_num]
 
         if result.status != "okay":
-            raise RuntimeError("View publish failed: " + response.reason)
+            raise RuntimeError("View publish failed: " + result.reason)
 
     def resolveAlias(self, alias):
         seq_num = Frame.generateSequenceNumber()
@@ -975,8 +975,12 @@ class Client(object):
             del self.synchronous_cond_vars[seq_num]
 
         if result.status != "okay":
-            raise RuntimeError("Unresolve failed: " + response.reason)
-        return base64.urlsafe_b64encode(str(result.getFirstValue("value")))
+            raise RuntimeError("Resolve failed: " + result.reason)
+        val = result.getFirstValue("value")
+        if val is not None:
+            return base64.urlsafe_b64encode(str(val))
+        else:
+            return None
 
     def unresolveAlias(self, b64_blob):
         blob = base64.urlsafe_b64decode(b64_blob)
@@ -1003,5 +1007,5 @@ class Client(object):
             del self.synchronous_cond_vars[seq_num]
 
         if result.status != "okay":
-            raise RuntimeError("Unresolve failed: " + response.reason)
-        return str(result.getFirstValue("value"))
+            raise RuntimeError("Unresolve failed: " + result.reason)
+        return result.getFirstValue("value")
