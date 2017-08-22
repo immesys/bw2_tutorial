@@ -115,12 +115,25 @@ class Client(BW2Client):
                     handler(msg)
                 return
         if self._subs.get(uri) is None:
-            super(Client, self).subscribe(uri, cb)
+            try:
+                super(Client, self).subscribe(uri, cb)
+            except RuntimeError as e:
+                if 'No primary access chain found' in e.message:
+                    print 'Do not have sufficient permissions to subscribe on',uri
+                else:
+                    raise e
+
         self._subs[uri] = handler
 
     def publish(self, uri, ponum, msg):
         po = PayloadObject(ponum, None, marshal(ponum, msg)) 
-        super(Client, self).publish(uri, payload_objects=(po,))
+        try:
+            super(Client, self).publish(uri, payload_objects=(po,))
+        except RuntimeError as e:
+            if 'No primary access chain found' in e.message:
+                print 'Do not have sufficient permissions to publish on',uri
+            else:
+                raise e
 
 if __name__ == '__main__':
     c = get_client()
