@@ -61,7 +61,6 @@ class Light():
         time_str = pacific.localize(datetime.now()).strftime("%Y-%m-%d %H:%M:%S (%Z)")
         from_name = msg.from_vk
         from_alias = self._bw_client.unresolveAlias(msg.from_vk)
-        print from_alias
         if from_alias is not None and from_alias != "":
             from_name = from_alias
         if msg.payload.lower() == "true":
