@@ -130,7 +130,8 @@ class Switch():
         return self._url
 
     def _switch_on_click(self, change):
-        time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S (%Z)")
+        pacific = pytz.timezone('America/Los_Angeles')
+        time_str = pacific.localize(datetime.now()).strftime("%Y-%m-%d %H:%M:%S (%Z)")
         if change['new'] == "Turn On":
             self._append_text("[" + time_str + "] switch is turned on.")
             self._switch_bw_client.publish(self._url, (64,0,0,1), "true")
