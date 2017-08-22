@@ -1,16 +1,16 @@
 from client import get_client
 import ipywidgets as widgets
+from datetime import datetime
 import os
 
-class Widgets():
-    def __init__(self, namespace = None, switch_name = "switch0", light_name = "light0", switch_entity = "switch.ent", light_entity = "light.ent", bw_agent = None):
+class Light():
+    def __init__(self, namespace = None, name = "light0", bw_entity = "light.ent", bw_agent = None):
         if namespace is None:
             namespace = os.environ.get('NAMESPACE')
         if namespace is None:
             raise Exception("Need to provide a namespace or set NAMESPACE")
 
-        self._switch_url = namespace + "/s.switch/" + switch_name + "/i.boolean/signal/state"
-        self._light_url = namespace + "/s.light/" + light_name + "/i.boolean/slot/state"
+        self._url = namespace + "/s.light/" + name + "/i.boolean/slot/state"
        
         # init light bulb 
         img_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "images")
@@ -24,6 +24,66 @@ class Widgets():
             width=75,
             height=120,
         )
+      
+        text_layout = widgets.Layout(width = "500px", height='100px')
+        self._text = widgets.Textarea(
+            value='',
+            description='Event Log:',
+            disabled=False,
+            layout=text_layout,
+        )
+        
+        # init a box widget
+        items = (self._light, self._text)
+        box_layout = widgets.Layout(
+            display='flex',
+            flex_flow='row',
+            align_items='center',
+            border='none',
+            width='100%',
+        )
+        self._box = widgets.Box(children=items, layout=box_layout)
+    
+        # init WAVE client
+        self._bw_client = get_client(agent=bw_agent, entity=bw_entity)
+        self._bw_client.subscribe(self._url, self._callback)
+
+    def display(self):
+        display(self._box)
+
+    def url(self):
+        return self._url
+
+    def _callback(self, msg):
+        # print "received: ", msg.payload
+        time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S (%Z)")
+        if msg.payload.lower() == "true":
+            self._append_text("[" + time_str + "] light is turned on.")
+            self._light.value = self._img_light_on
+        elif msg.payload.lower() == "false":
+            self._append_text("[" + time_str + "] light is turned off.")
+            self._light.value = self._img_light_off
+        elif msg.payload.lower() == "toggle":
+            if self._light.value is self._img_light_off:
+                self._append_text("[" + time_str + "] light is toggled on.")
+                self._light.value = self._img_light_on
+            elif self._light.value is self._img_light_on:
+                self._append_text("[" + time_str + "] light is toggled off.")
+                self._light.value = self._img_light_off
+
+    def _append_text(self, text):
+        if self._text != "":
+            text += "\n"
+        self._text.value = text + self._text.value
+    
+class Switch():
+    def __init__(self, namespace = None, name = "switch0", bw_entity = "switch.ent", bw_agent = None):
+        if namespace is None:
+            namespace = os.environ.get('NAMESPACE')
+        if namespace is None:
+            raise Exception("Need to provide a namespace or set NAMESPACE")
+
+        self._url = namespace + "/s.switch/" + name + "/i.boolean/signal/state"
        
         # init switch 
         self._switch = widgets.ToggleButtons(
@@ -35,47 +95,44 @@ class Widgets():
         self._switch.value = "Turn Off"
         self._switch.observe(self._switch_on_click, 'value')
         
-        # init a box widget that contains both the switch and light     
-        items = (self._switch, self._light)
+        text_layout = widgets.Layout(width = "500px", height='100px')
+        self._text = widgets.Textarea(
+            value='',
+            description='Event Log:',
+            disabled=False,
+            layout=text_layout,
+        )
+
+        # init a box widget
+        items = (self._switch, self._text)
         box_layout = widgets.Layout(
             display='flex',
             flex_flow='row',
             align_items='center',
-            border='solid',
-            width='30%',
+            border='none',
+            width='100%',
         )
         self._box = widgets.Box(children=items, layout=box_layout)
     
         # init WAVE client
-        self._switch_bw_client = get_client(agent=bw_agent, entity=switch_entity)
-
-        self._light_bw_client = get_client(agent=bw_agent, entity=light_entity)
-        self._light_bw_client.subscribe(self._light_url, self._light_callback)
+        self._switch_bw_client = get_client(agent=bw_agent, entity=bw_entity)
 
     def display(self):
         display(self._box)
 
-    def switch_url(self):
-        return self._switch_url
-
-    def light_url(self):
-        return self._light_url
+    def url(self):
+        return self._url
 
     def _switch_on_click(self, change):
+        time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S (%Z)")
         if change['new'] == "Turn On":
-            self._switch_bw_client.publish(self._switch_url, (64,0,0,1), "true")
+            self._append_text("[" + time_str + "] switch is turned on.")
+            self._switch_bw_client.publish(self._url, (64,0,0,1), "true")
         elif change['new'] == "Turn Off":
-            self._switch_bw_client.publish(self._switch_url, (64,0,0,1), "false")
+            self._append_text("[" + time_str + "] switch is turned off.")
+            self._switch_bw_client.publish(self._url, (64,0,0,1), "false")
     
-    def _light_callback(self, msg):
-        # print "received: ", msg.payload
-        if msg.payload.lower() == "true":
-            self._light.value = self._img_light_on
-        elif msg.payload.lower() == "false":
-            self._light.value = self._img_light_off
-        elif msg.payload.lower() == "toggle":
-            if self._light.value is self._img_light_off:
-                self._light.value = self._img_light_on
-            elif self._light.value is self._img_light_on:
-                self._light.value = self._img_light_off
-    
+    def _append_text(self, text):
+        if self._text != "":
+            text += "\n"
+        self._text.value = text + self._text.value
