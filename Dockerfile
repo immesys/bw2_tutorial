@@ -12,6 +12,7 @@ RUN jupyter nbextension enable --py  --sys-prefix widgetsnbextension
 RUN chown -R $NB_USER /home/$NB_USER/.local/share/jupyter
 RUN mkdir -p /home/$NB_USER/.ipynb_checkpoints
 RUN chown -R $NB_USER /home/$NB_USER/.ipynb_checkpoints
+RUN chown -R $NB_USER /home/$NB_USER
 
 COPY getentity.py /usr/local/bin/
 COPY getaccess /home/$NB_USER
@@ -26,3 +27,5 @@ ADD images /home/$NB_USER/images
 ADD python /home/$NB_USER/
 ENV PYTHONPATH /home/$NB_USER/python
 RUN chown $NB_USER /home/$NB_USER/WAVE.ipynb
+RUN rm -f /home/$NB_USER/.bw2bind.log
+
