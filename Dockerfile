@@ -20,6 +20,7 @@ COPY start.sh /usr/local/bin/
 COPY ragent /bin/
 RUN chmod 0755 /bin/ragent
 COPY bw2 /bin/
+COPY wave /bin/
 COPY bw2lint /bin/
 COPY rise_entity.ent /etc/
 COPY WAVE.ipynb /home/$NB_USER
