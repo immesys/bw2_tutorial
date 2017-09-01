@@ -1,14 +1,3 @@
-# bw2_tutorial
-A notebook-oriented tutorial for BW2
+# Please rather work with our fork of the risecamp 
 
-Build with:
-
-```
-docker build -t immesys/risecamp .
-```
-
-Run with:
-
-```
-docker run -it -p8888:8888 immesys/risecamp
-```
+https://github.com/immesys/risecamp
